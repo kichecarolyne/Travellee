@@ -29,6 +29,12 @@ const Navbar = () => {
                         <NavLink className="nav-link" to="/">HOME <span className="sr-only">(current)</span></NavLink>
                     </li>
                     <li className="nav-item">
+                        <NavLink className="nav-link" to="/destinations">DESTINATIONS</NavLink>
+                    </li>
+                    <li className="nav-item">
+                        <NavLink className="nav-link" to="/hotels">HOTELS</NavLink>
+                    </li>
+                    <li className="nav-item">
                         <NavLink className="nav-link" to="/login">LOGIN</NavLink>
                     </li>
                     <li className="nav-item">
@@ -45,7 +51,7 @@ const Navbar = () => {
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <NavLink className="navbar-brand" to="/">
                     {/* <img className='logo' src={logo} alt='logo' /> */}
-                    <b>Travellee</b>
+                    <b>TRAVELLEE</b>
                 </NavLink>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
