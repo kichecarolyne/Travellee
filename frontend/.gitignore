@@ -50,3 +50,7 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+
+
+# ENV
+.env

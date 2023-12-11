@@ -1,0 +1,36 @@
+/* Home.css */
+
+/* Section heading style */
+h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333; /* Adjust the color as needed */
+  }
+  
+  /* ProductGrid container style */
+  .product-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  /* ProductGrid item style */
+  .product-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    width: calc(33.33% - 20px); /* 3 columns with a 20px gap between them */
+    box-sizing: border-box;
+  }
+  
+  /* Product image style */
+  .product-image img {
+    width: 100%;
+    max-height: 200px;
+  }
+  
+  /* Product details style */
+  .product-details {
+    margin-top: 10px;
+    color: #555; /* Adjust the color as needed */
+  }
+  

@@ -1,14 +1,30 @@
+// Hotels.js
 import React from 'react';
+import ProductGrid from './ProductGrid';
+import { useAuth } from '../components/authContext';
+import hotelsData from '../data/hotelsData';
+import '../App.css';
 
-const Hotel = ({ image, title, description, location }) => {
+
+const Hotels = () => {
+  const { user } = useAuth(); // Get the user from the AuthContext
+
+  const handleAddToFavorites = (hotel) => {
+    if (user) {
+      // Add logic to save hotel to user's favorites
+      console.log(`Added ${hotel.title} to favorites`);
+    } else {
+      // Redirect or show a message that login is required
+      console.log('Please log in to add to favorites');
+    }
+  };
+
   return (
     <div>
-      <img src={image} alt={title} />
-      <h2>{title}</h2>
-      <p>{description}</p>
-      <p>Location: {location}</p>
+      <h1>Explore Hotels</h1>
+      <ProductGrid products={hotelsData} itemsPerPage={3} showPagination={true} onAddToFavorites={handleAddToFavorites} />
     </div>
   );
 };
 
-export default Hotel;
+export default Hotels;
