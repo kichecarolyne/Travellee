@@ -7,11 +7,9 @@ import Hotels from './components/Hotels';
 import ProductPage from './components/ProductPage';
 import BlogPage from './components/BlogPage';
 import Favorites from './components/Favorites';
-import Footer from './components/Footer';
 import NotFound from './components/NotFound';
 import Login from './components/Login';
 import Register from './components/Register';
-import './App.css';
 
 
 const App = () => {
@@ -30,7 +28,6 @@ const App = () => {
           <Route path="/register" component={Register} />
           <Route component={NotFound} />
         </Switch>
-        <Footer />
       </div>
     </Router>
   );

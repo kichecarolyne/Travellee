@@ -1,5 +1,3 @@
-// authContext.js
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext();
@@ -29,6 +27,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
+  // Function to handle user signup (you can replace this with your actual signup logic)
+  const signup = (userData) => {
+    // For example, setting the user and storing in local storage
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   // Function to handle user logout
   const logout = () => {
     // For example, removing the user from state and local storage
@@ -37,7 +42,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

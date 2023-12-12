@@ -3,7 +3,8 @@ import React from 'react';
 import ProductGrid from './ProductGrid';
 import { useAuth } from '../components/authContext';
 import hotelsData from '../data/hotelsData';
-import '../App.css';
+import './Product.css';
+import './Page.css';
 
 
 const Hotels = () => {
@@ -22,7 +23,7 @@ const Hotels = () => {
   return (
     <div>
       <h1>Explore Hotels</h1>
-      <ProductGrid products={hotelsData} itemsPerPage={3} showPagination={true} onAddToFavorites={handleAddToFavorites} />
+      <ProductGrid products={hotelsData} itemsPerPage={3} showPagination={true} onAddToFavorites={handleAddToFavorites} className="hotels-product-grid"  />
     </div>
   );
 };

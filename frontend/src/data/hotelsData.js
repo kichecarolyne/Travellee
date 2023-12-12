@@ -59,7 +59,7 @@ const hotelsData = [
         id: 8,
         image: 'https://i.imgur.com/TWB5YBN.png',
         title: 'Cottar Camp',
-        description: 'The 1920s Camp provides the romance of safari under cream canvas tents, the style of the bygone era of the twenties, while at the same time supplying the amenities required by modern world travellers and professional guides whose qualifications are some of the highest in Africa.',
+        description: 'The 1920s Camp provides the romance of safari under cream canvas tents.',
         location: 'Kenya',
         category: 'Camp',
       },

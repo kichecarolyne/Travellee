@@ -31,6 +31,25 @@ const Navbar = () => {
     } else {
       return (
         <>
+          <form className="form-inline my-2 my-lg-0 ml-auto">
+            <input
+              className="form-control mr-sm-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: '500px' }}
+            />
+            <button
+              className="btn btn-outline-secondary my-2 my-sm-0"
+              type="button"
+              onClick={handleSearch}
+            >
+              Search
+            </button>
+          </form>
+          
           <li className="nav-item">
             <NavLink className="nav-link" to="/destinations">
               DESTINATIONS
@@ -63,9 +82,8 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Upper Navbar */}
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <NavLink className="navbar-brand" to="/">
+        <NavLink className="navbar-brand" to="/" style={{ color: '#4169e1' }}>
           <b>TRAVELLEE</b>
         </NavLink>
         <button
@@ -84,42 +102,6 @@ const Navbar = () => {
           <ul className="navbar-nav ml-auto">
             <RenderNavbar />
           </ul>
-        </div>
-      </nav>
-
-      {/* Lower Navbar */}
-      <nav className="navbar navbar-light bg-light">
-        <div className="container">
-          <div className="ml-auto">
-            <ul className="navbar-nav mr-auto"> {/* Use "mr-auto" to push items to the far left */}
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/">
-                  HOME <span className="sr-only">(current)</span>
-                </NavLink>
-              </li>
-            </ul>
-          </div>
-
-          <div className="ml-auto">
-            <div className="input-group">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <div className="input-group-append">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={handleSearch}
-                >
-                  Search
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </nav>
     </>

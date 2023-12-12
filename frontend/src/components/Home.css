@@ -3,34 +3,134 @@
 /* Section heading style */
 h2 {
     margin-bottom: 20px;
+    margin-top: 40px;
+    padding-left: 20px;
     font-size: 24px;
     color: #333; /* Adjust the color as needed */
   }
-  
-  /* ProductGrid container style */
+
+  .explore-title {
+    text-decoration: underline;
+    margin-bottom: 10px;
+  }
+
   .product-grid-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    justify-content: space-around;
   }
   
-  /* ProductGrid item style */
-  .product-card {
-    border: 1px solid #ddd;
-    padding: 15px;
-    width: calc(33.33% - 20px); /* 3 columns with a 20px gap between them */
+  .grid-item {
+    width: 30%;
+    margin-bottom: 20px;
     box-sizing: border-box;
+    text-align: center; /* Center the content within the grid item */
   }
   
-  /* Product image style */
-  .product-image img {
-    width: 100%;
-    max-height: 200px;
+  .grid-item img {
+    max-width: 100%; /* Set a maximum width for the image */
+    height: 70%;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block; /* Center the image horizontally within the container */
+    margin: 0 auto; /* Center the image horizontally within the container */
+  }
+
+  .grid-item h3 {
+    font-size: 20px; /* Adjust the size as needed */
   }
   
-  /* Product details style */
-  .product-details {
-    margin-top: 10px;
-    color: #555; /* Adjust the color as needed */
+  .grid-item h3,
+  .grid-item p {
+    margin: 10px 0;
+  }
+
+
+  /* Medium screens */
+  @media (max-width: 768px) {
+    .product-grid-container {
+      display: flex;
+      grid-template-columns: 0.5fr; /* Change to a single column layout */
+      gap: 10px; /* Add some gap between items */
+    }
+
+    .explore-title {
+      text-decoration: underline;
+      margin-bottom: 20px;
+    }
+  
+    .grid-item {
+      /* Adjust individual item styling for smaller screens */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .grid-item p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333; /* Set your desired text color */
+      margin-top: 8px; /* Add some space at the top of the description */
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      margin-top: 30px;
+      padding-left: 20px;
+      font-size: 24px;
+      color: #333; /* Adjust the color as needed */
+    }
+
+    
+  }
+
+  /* Smaller screens */
+  @media (max-width: 320px) {
+    .product-grid-container {
+      display: flex;
+      grid-template-columns: 0.5fr; /* Change to a single column layout */
+      flex-wrap: wrap;
+      gap: 10px; /* Add some gap between items */
+    }
+
+    .explore-title {
+      text-decoration: underline;
+      margin-bottom: 20px;
+    }
+  
+    .grid-item {
+      /* Adjust individual item styling for smaller screens */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .grid-item p {
+      font-size: 10px;
+      line-height: 1.5;
+      color: #333; /* Set your desired text color */
+      margin-top: 8px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      margin-top: 40px;
+      padding-left: 20px;
+      font-size: 24px;
+      color: #333; /* Adjust the color as needed */
+    }
+  }
+
+  /* Footer */
+  .footer {
+    background-color: #333; /* Background color of the footer */
+    color: #fff; /* Text color */
+    padding: 20px; /* Padding inside the footer */
+    text-align: center; /* Center-align text */
+  }
+  
+  /* Optionally, you can style links inside the footer */
+  .footer a {
+    color: #fff; /* Link color */
+    text-decoration: none; /* Remove default underline */
+    margin: 0 10px; /* Add some space between links */
   }
   

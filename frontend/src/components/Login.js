@@ -6,6 +6,8 @@ const Login = () => {
   const { user, login, logout } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,13 +26,19 @@ const Login = () => {
         const userData = await response.json();
         // Perform your logic with the user data received from the server
         login(userData);
+        setLoginSuccess('Login successful'); // Set success message
+        setLoginError(''); // Clear any previous error message
       } else {
         // Handle unsuccessful login (e.g., show an error message)
-        console.error('Login failed');
+        const errorData = await response.json();
+        setLoginError(`Login failed: ${errorData.message}`);
+        setLoginSuccess(''); // Clear any previous success message
       }
     } catch (error) {
       // Handle network errors or other exceptions
-      console.error('Error during login:', error);
+      console.error('Login error:', error);
+      setLoginError('Login error. Please try again.');
+      setLoginSuccess(''); // Clear any previous success message
     }
   };
 
@@ -55,7 +63,7 @@ const Login = () => {
       }
     } catch (error) {
       // Handle network errors or other exceptions
-      console.error('Error during logout:', error);
+      console.error('Logout error:', error);
     }
   };
 
@@ -77,6 +85,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your Email"
+                    required
                   />
                 </div>
 
@@ -90,8 +99,14 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your Password"
+                    required
                   />
                 </div>
+
+                {/* Display login error message */}
+                {loginError && <p className="text-danger">{loginError}</p>}
+                {/* Display login success message */}
+                {loginSuccess && <p className="text-success">{loginSuccess}</p>}
 
                 <NavLink to='/register'>Didn't Register, then register here!</NavLink><br /><br />
                 <button type="submit" className="btn btn-primary" id='login' name='login' onClick={handleLogin}>Login</button>

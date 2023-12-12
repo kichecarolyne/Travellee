@@ -2,6 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import Pagination from './Pagination';
+import './Product.css';
+import './Page.css';
+
+
 
 const ProductGrid = ({ products, itemsPerPage, onAddToFavorites, showPagination }) => {
   const [currentPage, setCurrentPage] = useState(1);

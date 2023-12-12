@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 
 const app = express();
-const PORT = 3001;
+const PORT = 5000;
 
 mongoose.connect('mongodb://localhost:27017/travelblog', { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -24,9 +24,12 @@ const blogPostSchema = new mongoose.Schema({
   title: String,
   content: String,
   author: String,
-  createdAt: { type: Date, default: Date.now },
-});
+  likes: { type: Number, default: 0 },
+  comments: [{ text: String, author: String }],
+  shares: { type: Number, default: 0 },
+}, { timestamps: true });
 
+// Model based on schema
 const BlogPost = mongoose.model('BlogPost', blogPostSchema);
 
 app.use(bodyParser.json());
@@ -120,6 +123,34 @@ app.get('/api/blogposts', authenticateToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+// Like a blog post
+app.post('/api/blogposts/:postId/like', async (req, res) => {
+  const postId = req.params.postId;
+  const post = await BlogPost.findById(postId);
+  post.likes += 1;
+  await post.save();
+  res.json({ likes: post.likes });
+});
+
+// Comment on a blog post
+app.post('/api/blogposts/:postId/comment', async (req, res) => {
+  const postId = req.params.postId;
+  const { text, author } = req.body;
+  const post = await BlogPost.findById(postId);
+  post.comments.push({ text, author });
+  await post.save();
+  res.json(post);
+});
+
+// Share a blog post
+app.post('/api/blogposts/:postId/share', async (req, res) => {
+  const postId = req.params.postId;
+  const post = await BlogPost.findById(postId);
+  post.shares += 1;
+  await post.save();
+  res.json({ shares: post.shares });
 });
 
 app.listen(PORT, () => {
