@@ -39,6 +39,7 @@ __hcache__/
 # Miscellaneous
 .DS_Store
 
+pyvenv.cfg
 Scripts
 Lib
 Procfile
