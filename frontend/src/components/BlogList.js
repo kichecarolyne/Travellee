@@ -1,9 +1,9 @@
 // BlogList.js
-// BlogList.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const BlogList = ({ blogPosts, onDeletePost, onLikePost, onCommentPost }) => {
+
+const BlogList = ({ blogPosts, setBlogPosts, onDeletePost, onLikePost, onCommentPost }) => {
   // State for handling loading state
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +19,8 @@ const BlogList = ({ blogPosts, onDeletePost, onLikePost, onCommentPost }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [setBlogPosts]);
+
 
   if (loading) {
     return <p>Loading blog posts...</p>;

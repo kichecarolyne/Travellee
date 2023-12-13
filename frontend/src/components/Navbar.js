@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+
 
 const Navbar = () => {
   const token = localStorage.getItem('token');
@@ -24,6 +28,11 @@ const Navbar = () => {
           <li className="nav-item">
             <NavLink className="nav-link" to="/logout">
               LOGOUT
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink className="nav-link" to="/profile">
+              <FontAwesomeIcon icon={faUser} /> {/* Use the user icon */}
             </NavLink>
           </li>
         </>
@@ -66,7 +75,7 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink className="nav-link" to="/hotels">
+            <NavLink className="nav-link" to="/blog">
               BLOG
             </NavLink>
           </li>

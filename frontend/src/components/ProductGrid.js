@@ -1,13 +1,10 @@
-// ProductGrid.js
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import Pagination from './Pagination';
 import './Product.css';
 import './Page.css';
 
-
-
-const ProductGrid = ({ products, itemsPerPage, onAddToFavorites, showPagination }) => {
+const ProductGrid = ({ products, itemsPerPage, onAddToFavorites, onRateProduct, onCommentProduct, showPagination }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [displayedProducts, setDisplayedProducts] = useState([]);
 
@@ -22,11 +19,27 @@ const ProductGrid = ({ products, itemsPerPage, onAddToFavorites, showPagination 
     setCurrentPage(newPage);
   };
 
+  const handleRate = (productId, rating) => {
+    // Call a function to handle the rating action
+    onRateProduct(productId, rating);
+  };
+
+  const handleComment = (productId, comment) => {
+    // Call a function to handle the comment action
+    onCommentProduct(productId, comment);
+  };
+
   return (
     <div>
       <div className="product-grid">
         {displayedProducts.map((product) => (
-          <ProductCard key={product.id} data={product} onAddToFavorites={onAddToFavorites} />
+          <ProductCard
+            key={product.id}
+            data={product}
+            onAddToFavorites={onAddToFavorites}
+            onRate={(rating) => handleRate(product.id, rating)}
+            onComment={(comment) => handleComment(product.id, comment)}
+          />
         ))}
       </div>
       {showPagination && (

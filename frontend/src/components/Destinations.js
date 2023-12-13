@@ -6,24 +6,39 @@ import destinationsData from '../data/destinationsData';
 import './Product.css';
 import './Page.css';
 
-
 const Destinations = () => {
-  const { user } = useAuth(); // Get the user from the AuthContext
+  const { user } = useAuth();
+
+  const handleRateDestination = (destinationId, rating) => {
+    console.log(`Rated Destination ${destinationId} with ${rating} stars`);
+  };
+
+  const handleCommentDestination = (destinationId, comment) => {
+    console.log(`Commented on Destination ${destinationId}: ${comment}`);
+  };
 
   const handleAddToFavorites = (destination) => {
     if (user) {
-      // Add logic to save destination to user's favorites
       console.log(`Added ${destination.title} to favorites`);
     } else {
-      // Redirect or show a message that login is required
       console.log('Please log in to add to favorites');
     }
   };
 
+  console.log('Destinations Data:', destinationsData);
+
   return (
     <div>
       <h1>Explore Destinations</h1>
-      <ProductGrid products={destinationsData} itemsPerPage={3} showPagination={true} onAddToFavorites={handleAddToFavorites} className="hotels-product-grid"  />
+      <ProductGrid
+        products={destinationsData}
+        itemsPerPage={3}
+        showPagination={true}
+        onAddToFavorites={handleAddToFavorites}
+        onRateProduct={handleRateDestination}
+        onCommentProduct={handleCommentDestination}
+        className="hotels-product-grid"
+      />
     </div>
   );
 };

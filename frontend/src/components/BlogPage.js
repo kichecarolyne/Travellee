@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import BlogForm from './BlogForm';
 import BlogList from './BlogList';
 import Login from './Login';
-import Register from './Register';
+
 
 const BlogPage = () => {
   // State for user authentication
@@ -20,12 +20,6 @@ const BlogPage = () => {
   const handleLogin = (credentials) => {
     // Placeholder logic assuming successful login:
     setUser({ username: credentials.username });
-  };
-
-  // Function to handle user registration
-  const handleRegister = (userData) => {
-    // Placeholder logic assuming successful registration:
-    setUser({ username: userData.username });
   };
 
   // Function to handle adding a new blog post
@@ -64,12 +58,14 @@ const BlogPage = () => {
 
   // Render the BlogPage component
   return (
-    <div>
-      <h1>Travel Blog</h1>
+    <div className="container mt-4">
+      <h1 className="mb-4">Travel Blog</h1>
       {user ? (
         <div>
           <p>Welcome, {user.username}!</p>
-          <button onClick={() => setUser(null)}>Logout</button>
+          <button className="btn btn-danger" onClick={() => setUser(null)}>
+            Logout
+          </button>
           <BlogForm onSubmit={handleAddPost} />
           <BlogList
             blogPosts={blogPosts}
@@ -82,7 +78,6 @@ const BlogPage = () => {
         <div>
           <p>Please log in or register to access the blog.</p>
           <Login onSubmit={handleLogin} />
-          <Register onSubmit={handleRegister} />
         </div>
       )}
     </div>
