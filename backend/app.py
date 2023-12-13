@@ -1,144 +1,255 @@
-from flask import Flask, request, session, jsonify
-from flask_cors import CORS, cross_origin
-from flask_pymongo import PyMongo
-import jwt
+from flask import Flask, request, jsonify
+from flask_mongoengine import MongoEngine
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from models import BlogPost, Product, User
+import jwt
 
 app = Flask(__name__)
-CORS(app)
+app.config['MONGODB_SETTINGS'] = {
+    'db': 'mydatabase',
+    'host': 'localhost',
+    'port': 27017,
+    'connect': True
+}
 
-# Configuration for MongoDB
-app.config['MONGO_URI'] = 'mongodb+srv://new_user2:ojg9exOJ3lLV2ugV@cluster0.jxnz7i7.mongodb.net/travelblog'
-mongo = PyMongo(app)
-
-# Configuration for Flask-Bcrypt
+db = MongoEngine(app)
 bcrypt = Bcrypt(app)
 
-# Configuration for Flask-JWT-Extended
-app.config['JWT_SECRET_KEY'] = 'my-secret-key'
-jwt = JWTManager(app)
 
-# User registration endpoint
+def insert_data():
+    # Insert a Product
+    product = Product(name='Product 2', ratings=[4, 5], comments=[{'user': 'User1', 'text': 'Great product'}])
+    product.save()
+
+    # Insert a BlogPost
+    blog_post = BlogPost(title='My Second Blog Post', content='This is the content of the blog post.', author='Author1')
+    blog_post.save()
+
+    # Insert a User
+    user = User(email='user@example.com', name='John Wick', phone='3412567890', password='onehashed_password', cpassword='onehashed_password', tokens=[{'token': 'token123'}])
+    user.save()
+
+JWT_SECRET_KEY = 'my-secret-key'
+
+# User registration
 @app.route('/api/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        name = data.get('name')
+        phone = data.get('phone')
+        password = data.get('password')
+        cpassword = data.get('cpassword')
 
-    if 'username' not in data or 'password' not in data:
-        return jsonify({"error": "Missing username or password"}), 400
+        # Check for existing user
+        if User.objects(email=email).first() or User.objects(name=name).first() or User.objects(phone=phone).first():
+            return jsonify({'error': 'Email, Name, or Phone Number already exists'}), 401
 
-    username = data['username']
-    password = data['password']
+        # Check password matching
+        if password != cpassword:
+            return jsonify({'error': 'Passwords do not match'}), 401
 
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        # Check password strength (you can customize this according to your requirements)
+        if len(password) < 8:
+            return jsonify({'error': 'Password must be at least 8 characters long'}), 401
 
-    new_user = {
-        'username': username,
-        'password': hashed_password
-    }
+        hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    mongo.db.users.insert_one(new_user)
+        user = User(email=email, name=name, phone=phone, password=hashed_pw, cpassword=hashed_pw, tokens=[])
+        user.save()
 
-    return jsonify({"message": "User registered successfully"}), 201
+        # Create an access token using Flask-JWT-Extended
+        token = create_access_token(identity=user.email)
+        user.tokens.append({'token': token})
+        user.save()
+
+        return jsonify({'token': token}), 201
+
+    except Exception as e:
+        # Log the exception for debugging
+        app.logger.error(f"Error during registration: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 # User login endpoint
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
 
-    if 'username' not in data or 'password' not in data:
-        return jsonify({"error": "Missing username or password"}), 400
+        if not email or not password:
+            return jsonify({'error': 'Missing email or password'}), 400
 
-    username = data['username']
-    password = data['password']
+        user = User.objects(email=email).first()
 
-    user = mongo.db.users.find_one({'username': username})
+        if not user or not bcrypt.check_password_hash(user.password, password):
+            return jsonify({'error': 'Invalid credentials'}), 401
 
-    if user and bcrypt.check_password_hash(user['password'], password):
-        access_token = create_access_token(identity=username)
-        return jsonify({"token": access_token}), 200
+        token = jwt.encode({'email': email}, JWT_SECRET_KEY)
+        user.tokens[0]['token'] = token
+        user.save()
 
-    return jsonify({"error": "Invalid credentials"}), 401
+        return jsonify({'token': token}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 # Protected API endpoint for user logout
 @app.route('/api/logout', methods=['POST'])
-@jwt_required()
 def logout():
-    current_user = get_jwt_identity()
-    # Perform any additional logout logic if needed
-    return jsonify({"message": "Logout successful"}), 200
+    try:
+        current_user = request.user
+        # Perform any additional logout logic if needed
+        return jsonify({'message': 'Logout successful'}), 200
 
-# Protected API endpoint to create a new blog post
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# Product rating endpoint
+@app.route('/api/products/<string:productId>/rate', methods=['POST'])
+def rate_product(productId):
+    try:
+        data = request.get_json()
+        rating = data.get('rating')
+
+        product = Product.objects(id=productId).first()
+
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+
+        product.update(push__ratings=rating)
+        product.reload()
+
+        return jsonify({'message': 'Rating added successfully', 'product': product}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# Product commenting endpoint
+@app.route('/api/products/<string:productId>/comment', methods=['POST'])
+def comment_product(productId):
+    try:
+        data = request.get_json()
+        text = data.get('text')
+        user = data.get('user')
+
+        product = Product.objects(id=productId).first()
+
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+
+        product.update(push__comments={'user': user, 'text': text})
+        product.reload()
+
+        return jsonify({'message': 'Comment added successfully', 'product': product}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# Create a new blog post
 @app.route('/api/blogposts', methods=['POST'])
-@jwt_required()
 def create_blog_post():
-    data = request.get_json()
+    try:
+        data = request.get_json()
+        title = data.get('title')
+        content = data.get('content')
+        author = data.get('author')
 
-    if 'title' not in data or 'content' not in data or 'author' not in data:
-        return jsonify({"error": "Missing title, content, or author"}), 400
+        if not title or not content:
+            return jsonify({'error': 'Title and content are required'}), 400
 
-    title = data['title']
-    content = data['content']
-    author = data['author']
 
-    new_blog_post = {
-        'title': title,
-        'content': content,
-        'author': author,
-        'likes': 0,
-        'comments': [],
-        'shares': 0
-    }
+        new_blog_post = BlogPost(title=title, content=content, author=author, likes=0, comments=[], shares=0)
+        new_blog_post.save()
 
-    mongo.db.blogposts.insert_one(new_blog_post)
+        return jsonify({'message': 'Blog post created successfully', 'blogPost': new_blog_post}), 201
 
-    return jsonify(new_blog_post), 201
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
-# Protected API endpoint to get all blog posts
+# Get all blog posts
 @app.route('/api/blogposts', methods=['GET'])
-@jwt_required()
 def get_all_blog_posts():
-    blog_posts = list(mongo.db.blogposts.find())
-    return jsonify(blog_posts), 200
+    try:
+        blog_posts = BlogPost.objects()
+        return jsonify(blog_posts), 200
 
-# Like a blog post
-@app.route('/api/blogposts/<post_id>/like', methods=['POST'])
-def like_blog_post(post_id):
-    post = mongo.db.blogposts.find_one_and_update(
-        {'_id': int(post_id)},
-        {'$inc': {'likes': 1}},
-        return_document=True
-    )
-    return jsonify({'likes': post['likes']}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
-# Comment on a blog post
-@app.route('/api/blogposts/<post_id>/comment', methods=['POST'])
-def comment_on_blog_post(post_id):
-    data = request.get_json()
+# Get a specific blog post by ID
+@app.route('/api/blogposts/<string:postId>', methods=['GET'])
+def get_blog_post_by_id(postId):
+    try:
+        blog_post = BlogPost.objects(id=postId).first()
 
-    if 'text' not in data or 'author' not in data:
-        return jsonify({"error": "Missing text or author for comment"}), 400
+        if not blog_post:
+            return jsonify({'error': 'Blog post not found'}), 404
 
-    text = data['text']
-    author = data['author']
+        return jsonify(blog_post), 200
 
-    post = mongo.db.blogposts.find_one_and_update(
-        {'_id': int(post_id)},
-        {'$push': {'comments': {'text': text, 'author': author}}},
-        return_document=True
-    )
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
 
-    return jsonify(post), 200
+# Update a specific blog post by ID
+@app.route('/api/blogposts/<string:postId>', methods=['PUT'])
+def update_blog_post(postId):
+    try:
+        data = request.get_json()
+        title = data.get('title')
+        content = data.get('content')
+        author = data.get('author')
 
-# Share a blog post
-@app.route('/api/blogposts/<post_id>/share', methods=['POST'])
-def share_blog_post(post_id):
-    post = mongo.db.blogposts.find_one_and_update(
-        {'_id': int(post_id)},
-        {'$inc': {'shares': 1}},
-        return_document=True
-    )
-    return jsonify({'shares': post['shares']}), 200
+        # Fetch the existing blog post
+        existing_blog_post = BlogPost.objects(id=postId).first()
 
-if __name__ == '__main__':
-    app.run(debug=True)
+        if not existing_blog_post:
+            return jsonify({'error': 'Blog post not found'}), 404
+
+        # Update only the provided fields
+        if title:
+            existing_blog_post.title = title
+        if content:
+            existing_blog_post.content = content
+        if author:
+            existing_blog_post.author = author
+
+        # Save the updated blog post
+        existing_blog_post.save()
+
+        return jsonify({'message': 'Blog post updated successfully', 'blogPost': existing_blog_post}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+# Delete a specific blog post by ID
+@app.route('/api/blogposts/<string:postId>', methods=['DELETE'])
+def delete_blog_post(postId):
+    try:
+        deleted_blog_post = BlogPost.objects(id=postId).delete()
+
+        if not deleted_blog_post:
+            return jsonify({'error': 'Blog post not found'}), 404
+
+        return jsonify({'message': 'Blog post deleted successfully', 'blogPost': deleted_blog_post}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+# Start the server
+if __name__ == "__main__":
+    insert_data()
+   # app.run(debug=True)
+
