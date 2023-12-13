@@ -1,0 +1,46 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python env
+venv/
+env/
+.env/
+
+# Python virtual environment folders
+lib/
+scripts/
+
+# Exclude contents of the virtual environment
+**/lib/**
+**/scripts/**
+
+# IDE files
+.vscode/
+.idea/
+
+# Dependency folders
+tensorflow/
+__hcache__/
+
+# Compiled files
+*.pyc
+*.pyo
+*.pyd
+
+# Log files
+*.log
+
+# Local configuration file
+*.ini
+
+# Miscellaneous
+.DS_Store
+
+Scripts
+Lib
+Procfile
+Include
+requirements.txt
