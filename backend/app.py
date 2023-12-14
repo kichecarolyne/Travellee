@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_mongoengine import MongoEngine
+from flask_jwt_extended import JWTManager
+from flask_jwt_extended import create_access_token
 from flask_bcrypt import Bcrypt
 from models import BlogPost, Product, User
 import jwt
@@ -11,6 +13,12 @@ app.config['MONGODB_SETTINGS'] = {
     'port': 27017,
     'connect': True
 }
+
+jwt = JWTManager(app)
+
+
+app.config['JWT_SECRET_KEY'] = 'my-secret-key'
+
 
 db = MongoEngine(app)
 bcrypt = Bcrypt(app)
@@ -29,7 +37,11 @@ def insert_data():
     user = User(email='user@example.com', name='John Wick', phone='3412567890', password='onehashed_password', cpassword='onehashed_password', tokens=[{'token': 'token123'}])
     user.save()
 
-JWT_SECRET_KEY = 'my-secret-key'
+
+@app.route('/')
+def hello_world():
+    return 'Hello world!'
+
 
 # User registration
 @app.route('/api/register', methods=['POST'])
@@ -69,7 +81,8 @@ def register():
     except Exception as e:
         # Log the exception for debugging
         app.logger.error(f"Error during registration: {str(e)}")
-        return jsonify({'error': 'Internal Server Error'}), 500
+        return jsonify({'error': f'Internal Server Error: {str(e)}'}),
+
 
 # User login endpoint
 @app.route('/api/login', methods=['POST'])
