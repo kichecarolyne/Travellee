@@ -24,21 +24,21 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     // For example, setting the user and storing in local storage
     setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', JSON.stringify(userData.token));
   };
 
   // Function to handle user signup (you can replace this with your actual signup logic)
   const signup = (userData) => {
     // For example, setting the user and storing in local storage
     setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', JSON.stringify(userData));
   };
 
   // Function to handle user logout
   const logout = () => {
     // For example, removing the user from state and local storage
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

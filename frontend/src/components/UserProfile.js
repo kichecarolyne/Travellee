@@ -10,14 +10,11 @@ const UserProfile = () => {
     const fetchUserData = async () => {
       try {
         if (user) {
-          // Replace '/api/user' with the actual endpoint to fetch user data from the backend
           const response = await fetch('/api/user', {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
-              // Include any authentication headers if required
+              'Authorization': `Bearer ${user.token}`, // Include the user's token for authentication
             },
-            // Include credentials: 'include' if using cookies for authentication
           });
 
           if (!response.ok) {
@@ -48,7 +45,6 @@ const UserProfile = () => {
           ) : userData ? (
             <div>
               <p>Welcome, {user.username}!</p>
-              {/* Display user profile data */}
               <p>Email: {userData.email}</p>
               <p>Bio: {userData.bio}</p>
               {/* Add more fields as needed */}

@@ -30,7 +30,7 @@ const Register = () => {
     }
 
     try {
-      const res = await fetch('/adminRegister', {
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

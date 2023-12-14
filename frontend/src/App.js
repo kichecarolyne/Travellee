@@ -12,6 +12,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import { AuthProvider } from './components/authContext';
 import UserProfile from './components/UserProfile';
+import Logout from './components/Logout';
+
 
 const App = () => {
   return (
@@ -29,6 +31,7 @@ const App = () => {
             <Route path="/login" component={Login} />
             <Route path="/profile" component={UserProfile} />
             <Route path="/register" component={Register} />
+            <Route path="/logout" component={Logout} />
             <Route component={NotFound} />
           </Switch>
         </div>

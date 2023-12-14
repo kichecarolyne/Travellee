@@ -3,11 +3,12 @@ import { NavLink, useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-
+import Logout from './Logout';
 
 const Navbar = () => {
   const token = localStorage.getItem('token');
   const [searchQuery, setSearchQuery] = useState('');
+  
   const history = useHistory();
 
   const handleSearch = () => {
@@ -16,24 +17,33 @@ const Navbar = () => {
     }
   };
 
+
   const RenderNavbar = () => {
     if (token) {
       return (
         <>
+          <li className="nav-item">
+            <NavLink className="nav-link" to="/destinations">
+              DESTINATIONS
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink className="nav-link" to="/hotels">
+              HOTELS
+            </NavLink>
+          </li>
           <li className="nav-item">
             <NavLink className="nav-link" to="/favorites">
               FAVORITES
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink className="nav-link" to="/logout">
-              LOGOUT
+            <NavLink className="nav-link" to="/profile">
+              <FontAwesomeIcon icon={faUser} />
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink className="nav-link" to="/profile">
-              <FontAwesomeIcon icon={faUser} /> {/* Use the user icon */}
-            </NavLink>
+            <Logout />
           </li>
         </>
       );
