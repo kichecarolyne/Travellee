@@ -4,7 +4,7 @@ import ProductGrid from './ProductGrid';
 import { useAuth } from '../components/authContext';
 import hotelsData from '../data/hotelsData';
 import './Product.css';
-import './Page.css';
+
 
 const Hotels = () => {
   const { user } = useAuth();

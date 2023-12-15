@@ -4,7 +4,7 @@ import ProductGrid from './ProductGrid';
 import { useAuth } from '../components/authContext';
 import destinationsData from '../data/destinationsData';
 import './Product.css';
-import './Page.css';
+
 
 const Destinations = () => {
   const { user } = useAuth();
