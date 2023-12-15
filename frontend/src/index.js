@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './components/authContext';
 import { FavoritesProvider } from './components/FavoritesContext';
 import './App.css';
+import './index.css';
 
 
 ReactDOM.render(

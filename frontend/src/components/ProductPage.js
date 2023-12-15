@@ -6,7 +6,6 @@ const ProductPage = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Assuming you fetch products from an API
     const fetchProducts = async () => {
       try {
         const response = await fetch('your_api_endpoint/products');

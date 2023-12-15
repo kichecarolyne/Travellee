@@ -13,7 +13,7 @@ const UserProfile = () => {
           const response = await fetch('/api/user', {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${user.token}`, // Include the user's token for authentication
+              'Authorization': `Bearer ${user.token}`,
             },
           });
 
@@ -26,7 +26,6 @@ const UserProfile = () => {
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        // Handle error, e.g., redirect to login page
       } finally {
         setLoading(false);
       }
@@ -47,7 +46,6 @@ const UserProfile = () => {
               <p>Welcome, {user.username}!</p>
               <p>Email: {userData.email}</p>
               <p>Bio: {userData.bio}</p>
-              {/* Add more fields as needed */}
             </div>
           ) : (
             <p>Error loading user data.</p>

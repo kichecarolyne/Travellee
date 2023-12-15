@@ -10,15 +10,13 @@ const Logout = () => {
         const response = await fetch('/api/logout', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${user.token}`, // Include the user's token for authentication
+            'Authorization': `Bearer ${user.token}`,
           },
         });
 
         if (response.ok) {
           logout();
           console.log('Logout successful');
-          // Redirect to the home page after logout
-          // history.push('/');
         } else {
           console.error('Logout failed');
         }

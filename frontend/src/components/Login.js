@@ -13,7 +13,6 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      // Assuming you have a server endpoint for login
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
@@ -24,45 +23,39 @@ const Login = () => {
 
       if (response.ok) {
         const userData = await response.json();
-        // Perform your logic with the user data received from the server
         login(userData);
-        setLoginSuccess('Login successful'); // Set success message
-        setLoginError(''); // Clear any previous error message
+        setLoginSuccess('Login successful');
+        setLoginError('');
       } else {
-        // Handle unsuccessful login (e.g., show an error message)
+        // Handle unsuccessful login
         const errorData = await response.json();
         setLoginError(`Login failed: ${errorData.message}`);
-        setLoginSuccess(''); // Clear any previous success message
+        setLoginSuccess('');
       }
     } catch (error) {
       // Handle network errors or other exceptions
       console.error('Login error:', error);
       setLoginError('Login error. Please try again.');
-      setLoginSuccess(''); // Clear any previous success message
+      setLoginSuccess('');
     }
   };
 
   const handleLogout = async () => {
     try {
-      // Assuming you have a server endpoint for logout
       const response = await fetch('/api/logout', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${user.token}`, // Include the user's token for authentication
+          'Authorization': `Bearer ${user.token}`,
         },
       });
 
       if (response.ok) {
-        // Perform your logic for a successful logout
         logout();
-        // Optionally, you may want to redirect the user or perform other actions
         console.log('Logout successful');
       } else {
-        // Handle unsuccessful logout (e.g., show an error message)
         console.error('Logout failed');
       }
     } catch (error) {
-      // Handle network errors or other exceptions
       console.error('Logout error:', error);
     }
   };
@@ -74,7 +67,7 @@ const Login = () => {
           <div className='row'>
             <div className="col-sm-6 offset-md-3 offset-sm-1 ">
               <form method="POST">
-                {/* Your login form here */}
+                {/* Login form */}
                 <div className="form-group">
                   <label htmlFor="email">Email</label>
                   <input
@@ -103,9 +96,7 @@ const Login = () => {
                   />
                 </div>
 
-                {/* Display login error message */}
                 {loginError && <p className="text-danger">{loginError}</p>}
-                {/* Display login success message */}
                 {loginSuccess && <p className="text-success">{loginSuccess}</p>}
 
                 <NavLink to='/register'>Didn't Register, then register here!</NavLink><br /><br />

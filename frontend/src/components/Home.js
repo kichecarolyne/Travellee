@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Weather from './Weather';
 import Footer from './Footer';
 import './Home.css';
 
@@ -17,7 +18,7 @@ const Home = () => {
     const fetchWeatherData = async () => {
       setLoading(true);
   
-      let response; // Declare the response variable outside the try block
+      let response;
   
       try {
         if (!apiKey) {
@@ -76,6 +77,7 @@ const Home = () => {
     },
   ];
 
+// Hotels
   const hotels = [
     {
       id: 4,
@@ -103,6 +105,7 @@ const Home = () => {
     },
   ];
 
+// Recommended
   const recommended = [
     {
       id: 7,
@@ -164,22 +167,14 @@ const Home = () => {
           </div>
         ))}
       </div>
-
-      <h2 className="explore-title">Weather Update</h2>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
-        <p className="text-danger">{error}</p>
+        <p>Error: {error}</p>
       ) : (
-        <div className="product-grid-container">
-          {weatherData.map((weather) => (
-            <div key={weather.id} className="grid-item">
-              <h3>{weather.name}</h3>
-              <p>{weather.weather[0].description}</p>
-            </div>
-          ))}
-        </div>
+        <Weather data={weatherData} />
       )}
+      {window.location.pathname === '/' && <Weather />}
 
       {window.location.pathname === '/' && <Footer className="footer" />}
     </div>

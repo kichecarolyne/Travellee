@@ -19,7 +19,7 @@
 /* Smaller screens */
 @media (max-width: 320px) {
   .product-container {
-    border: none; /* Remove the product display border */
+    border: none;
     margin: 10px;
   }
 

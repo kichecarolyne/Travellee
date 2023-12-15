@@ -15,16 +15,14 @@ const BlogForm = ({ onSubmit }) => {
 
     // Create a new blog post object
     const newPost = {
-      id: Date.now(), // You can use a library for unique IDs
+      id: Date.now(),
       title,
       content,
-      author: 'Anonymous', // You can modify this based on your authentication system
+      author: 'Anonymous',
     };
 
-    // Pass the new post to the onSubmit function in the parent component
     onSubmit(newPost);
 
-    // Clear the form fields
     setTitle('');
     setContent('');
   };

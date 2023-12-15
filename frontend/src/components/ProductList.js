@@ -17,7 +17,7 @@ const ProductList = ({ products }) => {
     <div>
       {/* CategoryFilter component */}
       <CategoryFilter
-        categories={['all', 'Wildlife', 'Beaches']}  // Add your actual categories
+        categories={['all', 'Wildlife', 'Beaches']}
         onSelectCategory={handleSelectCategory}
       />
 
@@ -28,10 +28,8 @@ const ProductList = ({ products }) => {
       <ul>
         {filteredProducts.map(product => (
           <li key={product.id}>
-            {/* Display product details here */}
             <p>{product.name}</p>
             <p>{product.category}</p>
-            {/* Add more product details as needed */}
           </li>
         ))}
       </ul>

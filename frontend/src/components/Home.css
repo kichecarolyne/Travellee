@@ -1,17 +1,17 @@
 /* Home.css */
 
-/* Section heading style */
 h2 {
     margin-bottom: 20px;
-    margin-top: 40px;
+    margin-top: 20px;
     padding-left: 20px;
     font-size: 24px;
-    color: #333; /* Adjust the color as needed */
+    color: #333;
   }
 
   .explore-title {
     text-decoration: underline;
     margin-bottom: 10px;
+    margin-top: 20px;
   }
 
   .product-grid-container {
@@ -24,20 +24,20 @@ h2 {
     width: 30%;
     margin-bottom: 20px;
     box-sizing: border-box;
-    text-align: center; /* Center the content within the grid item */
+    text-align: center;
   }
   
   .grid-item img {
-    max-width: 100%; /* Set a maximum width for the image */
+    max-width: 100%;
     height: 70%;
     object-fit: cover;
     border-radius: 10px;
-    display: block; /* Center the image horizontally within the container */
-    margin: 0 auto; /* Center the image horizontally within the container */
+    display: block;
+    margin: 0 auto;
   }
 
   .grid-item h3 {
-    font-size: 20px; /* Adjust the size as needed */
+    font-size: 20px;
   }
   
   .grid-item h3,
@@ -50,17 +50,17 @@ h2 {
   @media (max-width: 768px) {
     .product-grid-container {
       display: flex;
-      grid-template-columns: 0.5fr; /* Change to a single column layout */
-      gap: 10px; /* Add some gap between items */
+      grid-template-columns: 0.5fr;
+      gap: 10px;
     }
 
     .explore-title {
       text-decoration: underline;
       margin-bottom: 20px;
+      margin-top: 20px;
     }
   
     .grid-item {
-      /* Adjust individual item styling for smaller screens */
       text-align: center;
       margin-bottom: 20px;
     }
@@ -68,8 +68,8 @@ h2 {
     .grid-item p {
       font-size: 14px;
       line-height: 1.5;
-      color: #333; /* Set your desired text color */
-      margin-top: 8px; /* Add some space at the top of the description */
+      color: #333;
+      margin-top: 8px;
     }
 
     h2 {
@@ -77,7 +77,7 @@ h2 {
       margin-top: 30px;
       padding-left: 20px;
       font-size: 24px;
-      color: #333; /* Adjust the color as needed */
+      color: #333;
     }
 
     
@@ -87,9 +87,9 @@ h2 {
   @media (max-width: 320px) {
     .product-grid-container {
       display: flex;
-      grid-template-columns: 0.5fr; /* Change to a single column layout */
+      grid-template-columns: 0.5fr;
       flex-wrap: wrap;
-      gap: 10px; /* Add some gap between items */
+      gap: 10px;
     }
 
     .explore-title {
@@ -98,7 +98,6 @@ h2 {
     }
   
     .grid-item {
-      /* Adjust individual item styling for smaller screens */
       text-align: center;
       margin-bottom: 20px;
     }
@@ -106,7 +105,7 @@ h2 {
     .grid-item p {
       font-size: 10px;
       line-height: 1.5;
-      color: #333; /* Set your desired text color */
+      color: #333;
       margin-top: 8px;
     }
 
@@ -115,22 +114,20 @@ h2 {
       margin-top: 40px;
       padding-left: 20px;
       font-size: 24px;
-      color: #333; /* Adjust the color as needed */
+      color: #333;
     }
   }
 
   /* Footer */
   .footer {
-    background-color: #333; /* Background color of the footer */
-    color: #fff; /* Text color */
-    padding: 20px; /* Padding inside the footer */
-    text-align: center; /* Center-align text */
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
   }
   
-  /* Optionally, you can style links inside the footer */
   .footer a {
-    color: #fff; /* Link color */
-    text-decoration: none; /* Remove default underline */
-    margin: 0 10px; /* Add some space between links */
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
   }
-  
