@@ -1,0 +1,5 @@
+Flask==2.0.1
+Flask-Cors==3.0.10
+Flask-JWT-Extended==4.2.1
+Flask-PyMongo==2.3.0
+PyJWT==2.1.0

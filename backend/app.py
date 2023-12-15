@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_mongoengine import MongoEngine
 from flask_jwt_extended import JWTManager
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 from models import BlogPost, Product, User
 import jwt
 
@@ -14,11 +15,12 @@ app.config['MONGODB_SETTINGS'] = {
     'connect': True
 }
 
+
 jwt = JWTManager(app)
-
-
 app.config['JWT_SECRET_KEY'] = 'my-secret-key'
 
+
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 db = MongoEngine(app)
 bcrypt = Bcrypt(app)
@@ -36,6 +38,11 @@ def insert_data():
     # Insert a User
     user = User(email='user@example.com', name='John Wick', phone='3412567890', password='onehashed_password', cpassword='onehashed_password', tokens=[{'token': 'token123'}])
     user.save()
+
+    users = {
+    'user1': {'password': 'hashed_password1'},
+    'user2': {'password': 'hashed_password2'},
+}
 
 
 @app.route('/')
@@ -89,27 +96,30 @@ def register():
 def login():
     try:
         data = request.get_json()
-        email = data.get('email')
+        name = data.get('name')
         password = data.get('password')
 
-        if not email or not password:
-            return jsonify({'error': 'Missing email or password'}), 400
+        # Check if the user exists and the password is correct
+        user = User.objects(name=name).first()
 
-        user = User.objects(email=email).first()
-
-        if not user or not bcrypt.check_password_hash(user.password, password):
-            return jsonify({'error': 'Invalid credentials'}), 401
-
-        token = jwt.encode({'email': email}, JWT_SECRET_KEY)
-        user.tokens[0]['token'] = token
-        user.save()
-
-        return jsonify({'token': token}), 200
+        if user and bcrypt.check_password_hash(user.password, password):
+            access_token = create_access_token(identity=name)
+            return jsonify(access_token=access_token), 200
+        else:
+            return jsonify(message='Invalid credentials'), 401
 
     except Exception as e:
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
+# Protected route
+@app.route('/api/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
+    
 # Protected API endpoint for user logout
 @app.route('/api/logout', methods=['POST'])
 def logout():
