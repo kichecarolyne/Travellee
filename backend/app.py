@@ -69,7 +69,7 @@ def register():
         if password != cpassword:
             return jsonify({'error': 'Passwords do not match'}), 401
 
-        # Check password strength (you can customize this according to your requirements)
+        # Check password strength
         if len(password) < 8:
             return jsonify({'error': 'Password must be at least 8 characters long'}), 401
 
@@ -125,7 +125,6 @@ def protected():
 def logout():
     try:
         current_user = request.user
-        # Perform any additional logout logic if needed
         return jsonify({'message': 'Logout successful'}), 200
 
     except Exception as e:
@@ -271,7 +270,6 @@ def delete_blog_post(postId):
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
-# Start the server
 if __name__ == "__main__":
     insert_data()
    # app.run(debug=True)
