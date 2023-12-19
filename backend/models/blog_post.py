@@ -12,6 +12,7 @@ class BlogPost(db.Document):
     likes = db.IntField(default=0)
     comments = db.ListField(db.DictField())
     shares = db.IntField(default=0)
+    users_who_favorited = db.ListField(db.ReferenceField('User'))
     meta = {
         'collection': 'Blogpost'
     }

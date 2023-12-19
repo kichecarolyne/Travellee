@@ -12,6 +12,9 @@ class User(db.Document):
     password = db.StringField(required=True)
     cpassword = db.StringField(required=True)
     tokens = db.ListField(db.DictField())
+    favorite_destinations = db.ListField(db.ReferenceField('Destination'))
+    favorite_hotels = db.ListField(db.ReferenceField('Hotel'))
+    favorite_blog_posts = db.ListField(db.ReferenceField('BlogPost'))
     meta = {
         'collection': 'User'
     }
