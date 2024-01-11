@@ -4,6 +4,9 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from models import BlogPost, Destination, Hotel, User, Itinerary
+from mongoengine import Document, StringField, ReferenceField, ListField
+from bson import ObjectId
+
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
@@ -18,19 +21,14 @@ app.config['JWT_SECRET_KEY'] = 'my-secret-key'
 
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+
 db = MongoEngine(app)
 bcrypt = Bcrypt(app)
 
 
+ratings_and_comments = []
+
 def insert_data():
-    # Insert a Destination
-    destination = Destination(name='Destination 1', ratings=[4, 5], comments=[{'user': 'User1', 'text': 'Beautiful scenery'}])
-    destination.save()
-
-    # Insert a Hotel
-    hotel = Hotel(name='Hotel 1', ratings=[4, 5], comments=[{'user': 'User1', 'text': 'Amazing service!'}])
-    hotel.save()
-
     # Insert a BlogPost
     blog_post = BlogPost(title='My Second Blog Post', content='This is the content of the blog post.', author='Author1')
     blog_post.save()
@@ -46,8 +44,102 @@ def insert_data():
 
 insert_data()
 
+def insert_destinations():
+    destinations_data = [  # List of destination data
+        {
+            "image": "url_to_image_1",
+            "title": "Destination 1",
+            "description": "Description for Destination 1",
+            "location": "Location 1",
+            "category": "Category 1",
+            "ratings": [4, 5],
+            "comments": [{"user": "User1", "comment": "Great place!"}],
+            "users_who_favorited": [],
+        },
+    ]
+
+    for data in destinations_data:
+        destination = Destination(**data)
+        destination.save()
+        print(f"Inserted {destination.title}")
+
+
+def insert_hotels():
+    hotels_data = [
+        {
+            "image": "url_to_image_1",
+            "title": "Hotel 1",
+            "description": "Description for Hotel 1",
+            "location": "Location 1",
+            "category": "Category 1",
+            "ratings": [4.5, 5],
+            "comments": [{"user": "User1", "comment": "Great service!"}],
+            "users_who_favorited": [],
+        },
+    ]
+
+    for data in hotels_data:
+        hotel = Hotel(**data)
+        hotel.save()
+        print(f"Inserted {hotel.title}")
+
+
+
+# Search functions
 def perform_search(query):
-    return [destination for destination in destinations_data if query.lower() in destination["name"].lower()]
+    """
+    Perform a search based on the provided query.
+    """
+    results = [item for item in data if query.lower() in item['title'].lower() or query.lower() in item['content'].lower()]
+    return results
+
+def perform_hotel_search(query):
+    hotels = Hotel.objects.search_text(query).limit(10)
+    return hotels
+
+def perform_destination_search(query):
+    destinations = Destination.objects.search_text(query).limit(10)
+    return destinations
+
+def perform_blog_search(query):
+    blogpost = BlogPost.objects.search_text(query).limit(10)
+    return blogpost
+
+
+class Favorite(Document):
+    """
+    Represents a favorite post for a user.
+    """
+    user_id = StringField(required=True)
+    post_id = StringField(required=True)
+    
+    @classmethod
+    def is_favorite(cls, user_id, post_id):
+        """
+        Check if a post is a favorite for a given user.
+        """
+        return cls.objects(user_id=user_id, post_id=post_id).first() is not None
+
+    @classmethod
+    def add_favorite(cls, user_id, post_id):
+        """
+        Add a post to favorites for a given user.
+        """
+        favorite = cls(user_id=user_id, post_id=post_id)
+        favorite.save()
+        return favorite
+
+    @classmethod
+    def remove_favorite(cls, user_id, post_id):
+        """
+        Remove a post from favorites for a given user.
+        """
+        favorite = cls.objects(user_id=user_id, post_id=post_id).first()
+        if favorite:
+            favorite.delete()
+            return True
+        return False
+
 
 @app.route('/')
 def hello_world():
@@ -114,6 +206,7 @@ def login():
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
+
 # Protected route
 @app.route('/api/protected', methods=['GET'])
 @jwt_required()
@@ -132,15 +225,8 @@ def logout():
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
-@app.route('/api/search')
-def search():
-    query = request.args.get('q', '')
 
-    # Perform a search query in data source
-    results = perform_search(query)
-
-    return jsonify(results)
-
+# Destination
 @app.route('/api/destination/<int:destination_id>')
 def get_destination(destination_id):
     # Retrieve destination details by ID
@@ -151,27 +237,6 @@ def get_destination(destination_id):
     else:
         return jsonify({"error": "Destination not found"}), 404
 
-
-@app.route('/api/hotel/<int:hotel_id>')
-def get_hotel(hotel_id):
-    # Retrieve hotel details by ID
-    hotel = next((h for h in hotels_data if h['id'] == hotel_id), None)
-
-    if hotel:
-        return jsonify(hotel)
-    else:
-        return jsonify({"error": "Hotel not found"}), 404
-
-
-@app.route('/api/blogpost/<int:blogpost_id>')
-def get_blogpost(blogpost_id):
-    # Retrieve blogpost details by ID
-    blogpost = next((b for b in blogpost_data if b['id'] == blogpost_id), None)
-
-    if blogpost:
-        return jsonify(blogpost)
-    else:
-        return jsonify({"error": "Blogpost not found"}), 404
 
 # Destination rating endpoint
 @app.route('/api/destinations/<string:hotelId>/rate', methods=['POST'])
@@ -217,21 +282,16 @@ def comment_destination(destinationId):
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-@app.route('/api/favorite/destination/<int:destination_id>', methods=['POST'])
-@jwt_required()
-def favorite_destination(destination_id):
-    user = get_current_user()
-    destination = Destination.objects(id=destination_id).first()
+# Hotel
+@app.route('/api/hotel/<int:hotel_id>')
+def get_hotel(hotel_id):
+    # Retrieve hotel details by ID
+    hotel = next((h for h in hotels_data if h['id'] == hotel_id), None)
 
-    if user and destination:
-        if destination not in user.favorite_destinations:
-            user.update(push__favorite_destinations=destination)
-            user.save()
-            return jsonify({'message': 'Destination favorited successfully'}), 200
-        else:
-            return jsonify({'message': 'Destination already favorited'}), 400
+    if hotel:
+        return jsonify(hotel)
     else:
-        return jsonify({'error': 'Invalid user or destination'}), 404
+        return jsonify({"error": "Hotel not found"}), 404
 
 
 # Hotel rating endpoint
@@ -278,31 +338,15 @@ def comment_hotel(hotelId):
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-@app.route('/api/favorite/hotel/<int:hotel_id>', methods=['POST'])
-@jwt_required()
-def favorite_hotel(hotel_id):
-    user = get_current_user()
-    hotel = Hotel.objects(id=hotel_id).first()
-
-    if user and hotel:
-        if hotel not in user.favorite_hotels:
-            user.update(push__favorite_hotels=hotel)
-            user.save()
-            return jsonify({'message': 'Hotel favorited successfully'}), 200
-        else:
-            return jsonify({'message': 'Hotel already favorited'}), 400
-    else:
-        return jsonify({'error': 'Invalid user or hotel'}), 404
-
-
-@app.route('/api/itineraries', methods=['GET'])
+# Itinerary
+@app.route('/api/itinerary', methods=['GET'])
 @jwt_required()
 def get_itineraries():
     current_user = get_jwt_identity()
     itineraries = Itinerary.objects(user=current_user)
     return jsonify(itineraries), 200
 
-@app.route('/api/itineraries', methods=['POST'])
+@app.route('/api/itinerary', methods=['POST'])
 @jwt_required()
 def create_itinerary():
     try:
@@ -322,7 +366,7 @@ def create_itinerary():
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
-@app.route('/api/itineraries/<string:itinerary_id>', methods=['PUT'])
+@app.route('/api/itinerary/<string:itinerary_id>', methods=['PUT'])
 @jwt_required()
 def update_itinerary(itinerary_id):
     try:
@@ -350,7 +394,7 @@ def update_itinerary(itinerary_id):
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
-@app.route('/api/itineraries/<string:itinerary_id>', methods=['DELETE'])
+@app.route('/api/itinerary/<string:itinerary_id>', methods=['DELETE'])
 @jwt_required()
 def delete_itinerary(itinerary_id):
     try:
@@ -364,6 +408,24 @@ def delete_itinerary(itinerary_id):
     except Exception as e:
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
+
+
+# Blog post
+blogposts = [
+    {"_id": ObjectId("5f0a556cc9e77c6d1cfb2bb4"), "title": "Blog Post 1"},
+]
+
+
+@app.route('/api/blogpost/<int:blogpost_id>')
+def get_blogpost(blogpost_id):
+    # Retrieve blogpost details by ID
+    blogpost = next((b for b in blogpost_data if b['id'] == blogpost_id), None)
+
+    if blogpost:
+        return jsonify(blogpost)
+    else:
+        return jsonify({"error": "Blogpost not found"}), 404
+
 
 # Create a new blog post
 @app.route('/api/blogposts', methods=['POST'])
@@ -447,40 +509,180 @@ def update_blog_post(postId):
 
 
 # Delete a specific blog post by ID
-@app.route('/api/blogposts/<string:postId>', methods=['DELETE'])
-def delete_blog_post(postId):
+@app.route('/api/blogposts/<string:post_id>', methods=['DELETE'])
+def delete_blogpost(post_id):
     try:
-        deleted_blog_post = BlogPost.objects(id=postId).delete()
+        # Validate ObjectId
+        if not ObjectId.is_valid(post_id):
+            return jsonify({'error': 'Invalid ObjectId'}), 400
 
-        if not deleted_blog_post:
+        result = mongo.db.blogposts.delete_one({'_id': ObjectId(post_id)})
+
+        if result.deleted_count == 0:
             return jsonify({'error': 'Blog post not found'}), 404
 
-        return jsonify({'message': 'Blog post deleted successfully', 'blogPost': deleted_blog_post}), 200
+        return jsonify({'message': 'Blog post deleted successfully'}), 200
 
     except Exception as e:
-        print(str(e))
+        print(e)
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-@app.route('/api/favorite/blogpost/<string:blogpost_id>', methods=['POST'])
-@jwt_required()
-def favorite_blogpost(blogpost_id):
-    user = get_current_user()
-    blogpost = BlogPost.objects(id=blogpost_id).first()
+# Search Endpoints
+@app.route('/api/search', methods=['GET'])
+def search():
+    query = request.args.get('q')  # Get the 'q' query parameter from the request
+    if not query:
+        return jsonify({'error': 'Query parameter is required!'}), 400
+    
+    # Perform a search in your MongoDB collections (e.g., BlogPost, Destination, Hotel)
+    blog_results = perform_blog_search(query)
+    hotel_results = perform_hotel_search(query)
+    destination_results = perform_destination_search(query)
+    
+    # Combine results from different collections if needed
+    combined_results = {
+        'blogs': blog_results,
+        'hotels': hotel_results,
+        'destinations': destination_results
+    }
+    
+    return jsonify(combined_results), 200
 
-    if user and blogpost:
-        if blogpost not in user.favorite_blog_posts:
-            user.update(push__favorite_blog_posts=blogpost)
-            user.save()
-            return jsonify({'message': 'Blog post favorited successfully'}), 200
-        else:
-            return jsonify({'message': 'Blog post already favorited'}), 400
-    else:
-        return jsonify({'error': 'Invalid user or blog post'}), 404
+
+
+@app.route('/api/search/hotels', methods=['GET'])
+def search_hotels():
+    query = request.args.get('q', '')
+    results = perform_hotel_search(query)
+    
+    hotels_list = []
+    for hotel in results:
+        hotels_list.append({
+            'name': hotel.name,
+            'description': hotel.description,
+            'ratings': hotel.ratings,
+            'comments': hotel.comments,
+        })
+    
+    return jsonify(hotels_list)
+
+@app.route('/api/search/destinations', methods=['GET'])
+def search_destinations():
+    query = request.args.get('q', '')
+    results = perform_destination_search(query)
+    
+    destinations_list = []
+    for destination in results:
+        destinations_list.append({
+            'name': destination.name,
+            'description': destination.description,
+            'location': destination.location,
+        })
+    
+    return jsonify(destinations_list)
+
+@app.route('/api/search/blogs', methods=['GET'])
+def search_blogs():
+    query = request.args.get('q', '')
+    results = perform_blog_search(query)
+    
+    blogs_list = []
+    for blog in results:
+        blogs_list.append({
+            'title': blog.title,
+            'content': blog.content,
+            'author': blog.author,
+            'tags': blog.tags,
+        })
+    
+    return jsonify(blogs_list)
+
+
+# Favorites
+def get_current_user_id():
+    return get_jwt_identity()
+
+@app.route('/api/favorite/destination/<destination_id>', methods=['POST'])
+@jwt_required()
+def favorite_destination(destination_id):
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.objects.get(id=current_user_id)
+        
+        if Favorite.is_favorite(user_id, destination_id):
+            return jsonify({"message": "Destination already favorited"}), 400
+
+        Favorite.add_favorite(user_id, destination_id)
+        
+        return jsonify({"message": "Destination favorited successfully"}), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+@app.route('/api/favorite/hotel/<hotel_id>', methods=['POST'])
+@jwt_required()
+def favorite_hotel(hotel_id):
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.objects.get(id=current_user_id)
+        
+        if Favorite.is_favorite(user_id, hotel_id):
+            return jsonify({"message": "Hotel already favorited"}), 400
+
+        Favorite.add_favorite(user_id, hotel_id)
+        
+        return jsonify({"message": "Hotel favorited successfully"}), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+@app.route('/api/favorite/blog/<blog_id>', methods=['POST'])
+@jwt_required()
+def favorite_blog(blog_id):
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.objects.get(id=current_user_id)
+        
+        if Favorite.is_favorite(user_id, blog_id):
+            return jsonify({"message": "Blog already favorited"}), 400
+
+        Favorite.add_favorite(user_id, blog_id)
+        
+        return jsonify({"message": "Blog favorited successfully"}), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error', 'details': str(e)}), 500
+
+
+app.route('/api/submitRatingAndComment', methods=['POST'])
+def submit_rating_and_comment():
+    # Extract data from the request
+    data = request.json
+    rating = data.get('rating')
+    comment = data.get('comment')
+    authToken = data.get('authToken')
+
+
+    # Basic validation
+    if not rating or not comment or not authToken:
+        return jsonify({'status': 'error', 'message': 'Missing required data'}), 400
+
+    if not is_valid_auth_token(authToken):
+        return jsonify({'status': 'error', 'message': 'Invalid authentication'}), 401
+
+    # Store the rating and comment)
+    ratings_and_comments.append({'rating': rating, 'comment': comment})
+
+    return jsonify({'status': 'success', 'rating': rating, 'comment': comment}), 200
+
+def is_valid_auth_token(token):
+    return True
+
 
 
 
 if __name__ == "__main__":
-    insert_data()
-   # app.run(debug=True)
+   # insert_data()
+    app.run(debug=True)
 

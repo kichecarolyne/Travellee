@@ -41,6 +41,7 @@ __hcache__/
 
 pyvenv.cfg
 Scripts
+script.py
 Lib
 Procfile
 Include
