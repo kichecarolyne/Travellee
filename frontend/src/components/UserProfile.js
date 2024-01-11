@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './authContext';
 
+
 const UserProfile = () => {
   const { user } = useAuth();
   const [userData, setUserData] = useState(null);
@@ -46,6 +47,8 @@ const UserProfile = () => {
               <p>Welcome, {user.username}!</p>
               <p>Email: {userData.email}</p>
               <p>Bio: {userData.bio}</p>
+
+              {/* Display the user's blogs */}
             </div>
           ) : (
             <p>Error loading user data.</p>

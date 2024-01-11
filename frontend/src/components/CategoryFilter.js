@@ -1,19 +1,17 @@
-// CategoryFilter.js
 import React from 'react';
 
 const CategoryFilter = ({ categories, onSelectCategory }) => {
+  const categoryItems = (categories || []).map((category, index) => (
+    <option key={index} value={category}>
+      {category}
+    </option>
+  ));
+
   return (
-    <div>
-      <label htmlFor="category">Select Category:</label>
-      <select id="category" onChange={(e) => onSelectCategory(e.target.value)}>
-        <option value="all">All Categories</option>
-        {categories.map((category) => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
-    </div>
+    <select onChange={(e) => onSelectCategory(e.target.value)}>
+      <option value="all">All Categories</option>
+      {categoryItems}
+    </select>
   );
 };
 

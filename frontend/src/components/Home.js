@@ -174,7 +174,6 @@ const Home = () => {
       ) : (
         <Weather data={weatherData} />
       )}
-      {window.location.pathname === '/' && <Weather />}
 
       {window.location.pathname === '/' && <Footer className="footer" />}
     </div>

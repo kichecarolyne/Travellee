@@ -1,16 +1,16 @@
 // Pagination.js
 import React from 'react';
+import ReactPaginate from 'react-js-pagination';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ totalPages, onPageChange }) => {
   return (
-    <div className="pagination">
-      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
-        Previous
-      </button>
-      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-        Next
-      </button>
-    </div>
+    <ReactPaginate
+      containerClassName="pagination"
+      subContainerClassName="pages pagination"
+      activeClassName="active"
+      pageCount={totalPages}
+      onPageChange={onPageChange}
+    />
   );
 };
 

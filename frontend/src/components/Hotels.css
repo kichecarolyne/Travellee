@@ -1,0 +1,76 @@
+/* Hotels.css */
+.hotel-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .hotel-item {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 8px;
+  }
+  
+  .hotel-item img {
+    width: 90%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  
+  @media (max-width: 768px) {
+
+.hotel-item {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .hotel-item:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .hotel-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .hotel-item h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .hotel-item p {
+    margin-bottom: 10px;
+  }
+  
+  .hotel-item strong {
+    font-weight: bold;
+  }
+  
+  .hotel-item ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .hotel-item li {
+    margin-bottom: 5px;
+  }
+  
+  .hotel-item button {
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  
+  .text-danger {
+    color: #dc3545;
+  }
+}

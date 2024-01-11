@@ -4,22 +4,41 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import Logout from './Logout';
+import axios from 'axios';
 
-const Navbar = () => {
-  const token = localStorage.getItem('token');
-  const [searchQuery, setSearchQuery] = useState('');
-  
+
+const Navbar = ({ isLoggedIn, onLogout }) => {
   const history = useHistory();
+  const token = localStorage.getItem('token');
 
-  const handleSearch = () => {
-    if (searchQuery.trim() !== '') {
-      history.push(`/search-results?q=${encodeURIComponent(searchQuery)}`);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [results, setResults] = useState([]);
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`/api/search?q=${searchQuery}`);
+      setResults(response.data);
+      // Clear the search query after successfully fetching results
+      setSearchQuery('');
+    } catch (error) {
+      console.error("Error searching:", error);
     }
   };
+  
+  // Reset the search results when navigating away or on some other action
+  const handleNavigationOrAction = () => {
+    setResults([]); // Clear the results
+    setSearchQuery(''); // Clear the search query
+  };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    onLogout();
+    history.push('/login');
+  };
 
   const RenderNavbar = () => {
-    if (token) {
+    if (isLoggedIn) {
       return (
         <>
           <li className="nav-item">
@@ -48,32 +67,13 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li className="nav-item">
-            <Logout />
+            <Logout onLogout={onLogout} />
           </li>
         </>
       );
     } else {
       return (
-        <>
-          <form className="form-inline my-2 my-lg-0 ml-auto">
-            <input
-              className="form-control mr-sm-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '500px' }}
-            />
-            <button
-              className="btn btn-outline-secondary my-2 my-sm-0"
-              type="button"
-              onClick={handleSearch}
-            >
-              Search
-            </button>
-          </form>
-          
+        <>          
           <li className="nav-item">
             <NavLink className="nav-link" to="/destinations">
               DESTINATIONS
@@ -124,6 +124,33 @@ const Navbar = () => {
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ml-auto">
+          {/* Search Bar */}
+          <li className="nav-item">
+              <input
+                className="form-control mr-sm-2"
+                type="search"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: '500px' }}
+              />
+            </li>
+            
+            {/* Search Button */}
+            <li className="nav-item">
+              <button className="btn btn-outline-secondary" onClick={handleSearch}>
+                Search
+              </button>
+            </li>
+            
+            {/* Display Results */}
+            {results.map((result, index) => (
+              <li key={index}>
+                <h3>{result.title}</h3>
+                <p>{result.content}</p>
+              </li>
+            ))}
+            
             <RenderNavbar />
           </ul>
         </div>

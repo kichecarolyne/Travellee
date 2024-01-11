@@ -1,0 +1,8 @@
+/* src/components/Pagination.css */
+.pagination {
+    /* Add your styles for pagination */
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
